@@ -1,0 +1,20 @@
+:root {
+    --bg-main: #0f172a;
+    --bg-card: #1e293b;
+    --gold: #f59e0b;
+}
+body { background-color: var(--bg-main); color: white; }
+.bg-custom-card { background-color: var(--bg-card); }
+.border-gold { border-color: var(--gold); }
+.text-gold { color: var(--gold); }
+:root {
+    --gold: #FFD700;
+    --bg-dark: #0F1117;
+    --card-dark: #161922;
+}
+body { background-color: var(--bg-dark); color: white; }
+.bg-custom-sidebar { background-color: #0B0E14; }
+.bg-custom-card { background-color: var(--card-dark); }
+.text-gold { color: var(--gold); }
+.bg-gold { background-color: var(--gold); }
+.border-gold { border-color: var(--gold); }

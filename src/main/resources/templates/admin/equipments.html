@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Thiết bị & Tài liệu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/equipments.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="flex h-screen overflow-hidden">
+
+<aside class="w-72 bg-sidebar border-r border-custom flex flex-col">
+    <div class="p-8">
+        <div class="flex items-center gap-3">
+        </div>
+    </div>
+
+    <nav class="flex-1 px-6 space-y-1">
+        <p class="text-gray-600 text-[11px] font-bold uppercase mb-4 px-2 tracking-widest">Quản trị</p>
+        <a href="#" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition">
+            <i class="fas fa-th-large w-8 text-center mr-2"></i> Bảng điều khiển
+        </a>
+        <a th:href="@{/admin/equipments}" class="flex items-center text-white bg-white/5 border-r-4 border-gold p-3 rounded-xl">
+            <i class="fas fa-box w-8 text-center mr-2 text-gold"></i> Thiết bị & Tài liệu
+        </a>
+        <a th:href="@{/admin/users}" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition">
+            <i class="fas fa-users w-8 text-center mr-2"></i> Người dùng
+        </a>
+        <a href="#" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition justify-between">
+            <span><i class="fas fa-file-invoice w-8 text-center mr-2"></i> Phiếu mượn</span>
+            <span class="bg-gold text-black text-[10px] px-2 py-0.5 rounded-full font-bold">5</span>
+        </a>
+    </nav>
+
+    <div class="p-6 border-t border-custom mt-auto">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">A</div>
+            <div class="flex-1">
+                <p class="text-sm font-bold">Admin Hệ thống</p>
+                <p class="text-[10px] text-gray-500 uppercase" th:text="${userLogin}"></p>
+            </div>
+            <a th:href="@{/auth/logout}" class="text-gray-500 hover:text-white transition-all">
+                <i  class="fas fa-sign-out-alt text-gray-500 cursor-pointer hover:text-white"></i>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<main class="flex-1 overflow-y-auto bg-main">
+    <header class="p-10 flex justify-between items-start">
+        <div>
+            <h2 class="text-3xl font-bold tracking-tight">Quản lý Thiết bị & Tài liệu</h2>
+            <p class="text-gray-500 mt-2">Thiết bị thực hành — <span class="text-gray-300" th:text="${equipments.size() + ' loại'}">0 loại</span></p>
+        </div>
+        <button onclick="openModal()" class="bg-gold hover:bg-yellow-500 text-black font-bold py-3 px-8 rounded-2xl flex items-center shadow-2xl shadow-yellow-500/10 transition-all active:scale-95">
+            <i class="fas fa-plus mr-2"></i> Thêm thiết bị
+        </button>
+    </header>
+
+    <div class="px-10 flex items-center gap-4 mb-8">
+        <div class="relative flex-1 max-w-sm">
+            <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input type="text" placeholder="Tìm tên hoặc mã thiết bị..." class="w-full bg-card border border-custom rounded-2xl py-4 pl-14 pr-4 text-sm focus:outline-none focus:border-gold/50 transition">
+        </div>
+        <div class="flex bg-card p-1.5 rounded-2xl border border-custom">
+            <button class="px-6 py-2.5 bg-gray-700/50 rounded-xl text-sm font-medium">Tất cả</button>
+            <button class="px-6 py-2.5 text-gray-500 hover:text-white text-sm transition">Vi điều khiển</button>
+            <button class="px-6 py-2.5 text-gray-500 hover:text-white text-sm transition">Linh kiện</button>
+            <button class="px-6 py-2.5 text-gray-500 hover:text-white text-sm transition">Thiết bị</button>
+            <button class="px-6 py-2.5 text-gray-500 hover:text-white text-sm transition">Cảm biến</button>
+        </div>
+    </div>
+
+    <div class="px-10 pb-10">
+        <div class="bg-card border border-custom rounded-[32px] overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="border-b border-custom">
+                <tr class="text-[11px] text-gray-500 uppercase tracking-[2px]">
+                    <th class="px-8 py-6">Thiết bị / Tài liệu</th>
+                    <th class="px-8 py-6">Mã thiết bị / Danh mục</th>
+                    <th class="px-8 py-6">Tồn kho</th>
+                    <th class="px-8 py-6">Trạng thái</th>
+                    <th class="px-8 py-6"></th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-custom">
+                <tr th:each="item : ${equipments}" class="hover:bg-white/[0.02] transition group">
+                    <td class="px-8 py-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center text-teal-400 border border-teal-500/20">
+                                <i class="fas fa-cube text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-200" th:text="${item.name}">Tên</p>
+                                <p class="text-xs text-gray-500 mt-0.5">Chiếc</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <p class="text-sm font-medium text-gray-400" th:text="'EQ-00' + ${item.id}">Mã</p>
+                        <p class="text-xs text-gray-600 mt-1" th:text="${item.categoryName}">Danh mục</p>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div class="flex flex-col gap-2">
+                            <p class="text-sm font-bold">
+                                <span th:text="${item.available}">0</span>
+                                <span class="text-gray-600 font-normal" th:text="'/ ' + ${item.quantity}">/ 0</span>
+                            </p>
+                            <div class="progress-bar">
+                                <div th:classappend="${item.available < 5} ? 'bg-red-500' : 'bg-gold'"
+                                     class="h-full transition-all duration-500"
+                                     th:style="'width: ' + (${item.quantity > 0} ? (${item.available} * 100 / ${item.quantity}) : 0) + '%'"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div th:if="${item.available < 5}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-wider">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Sắp hết
+                        </div>
+                        <div th:if="${item.available >= 5}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-500 text-[10px] font-bold uppercase tracking-wider">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Đủ hàng
+                        </div>
+                    </td>
+                    <td class="px-8 py-6 text-right">
+                        <div class="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition">
+                                <a th:href="@{/admin/update/{id}(id=${item.id}, page=${currentPage})}"
+                                   class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition flex items-center justify-center">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a th:href="@{/admin/delete-confirm/{id}(id=${item.id}, page=${currentPage})}"
+                                   class="w-10 h-10 rounded-xl bg-white/5 hover:bg-red-500/10 text-gray-400 hover:text-red-500 transition flex items-center justify-center">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="px-8 py-6 border-t border-custom flex items-center justify-between bg-card/50">
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">
+                    Trang <span class="text-gray-300" th:text="${currentPage}">1</span> trên <span class="text-gray-300" th:text="${totalPages}">1</span>
+                </p>
+
+                <div class="flex items-center gap-2">
+                    <a th:href="@{/admin/equipments(page=${currentPage - 1})}"
+                       th:classappend="${currentPage <= 1} ? 'opacity-20 pointer-events-none' : ''"
+                       class="w-10 h-10 rounded-xl border border-custom flex items-center justify-center text-gray-500 hover:bg-white/5 hover:text-white transition">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </a>
+
+                    <div class="flex items-center gap-1">
+                        <a th:each="i : ${#numbers.sequence(1, totalPages)}"
+                           th:href="@{/admin/equipments(page=${i})}"
+                           th:text="${i}"
+                           th:classappend="${currentPage == i} ? 'bg-gold text-black shadow-lg shadow-yellow-500/20' : 'border border-custom text-gray-500 hover:bg-white/5 hover:text-white'"
+                           class="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold transition">
+                        </a>
+                    </div>
+
+                    <a th:href="@{/admin/equipments(page=${currentPage + 1})}"
+                       th:classappend="${currentPage >= totalPages} ? 'opacity-20 pointer-events-none' : ''"
+                       class="w-10 h-10 rounded-xl border border-custom flex items-center justify-center text-gray-500 hover:bg-white/5 hover:text-white transition">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="modalAdd" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-card w-full max-w-lg rounded-[40px] border border-custom shadow-2xl overflow-hidden scale-95 transition-all animate-modal">
+        <div class="p-8 border-b border-custom flex justify-between items-center">
+            <h3 class="text-2xl font-bold">Thêm thiết bị mới</h3>
+            <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-white/5 flex items-center justify-center text-gray-500 hover:text-white transition">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form th:action="@{/admin/add(page=${currentPage})}" th:object="${equipment}" method="post" class="p-10 space-y-6">
+
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-3">Tên thiết bị / Tài liệu</label>
+                <input type="text" th:field="*{name}" placeholder="Ví dụ: Arduino Uno R3"
+                       class="w-full bg-main border border-custom rounded-2xl p-4 focus:outline-none focus:border-gold transition"
+                       th:classappend="${#fields.hasErrors('name')} ? 'border-red-500' : ''">
+                <small class="text-red-500 text-xs mt-2 block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-3">Đơn vị</label>
+                    <input type="text" value="Chiếc" class="w-full bg-main border border-custom rounded-2xl p-4 focus:outline-none focus:border-gold transition">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-3">Số lượng</label>
+                    <input type="number" th:field="*{quantity}"
+                           class="w-full bg-main border border-custom rounded-2xl p-4 focus:outline-none focus:border-gold transition text-white"
+                           th:classappend="${#fields.hasErrors('quantity')} ? 'border-red-500' : ''">
+                    <small class="text-red-500 text-xs mt-2 block" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></small>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-3">Danh mục</label>
+                    <div class="relative">
+                        <select th:field="*{categoryName}" class="w-full bg-main border border-custom rounded-2xl p-4 appearance-none focus:outline-none focus:border-gold text-white">
+                            <option value="Vi điều khiển">Vi điều khiển</option>
+                            <option value="Linh kiện">Linh kiện</option>
+                            <option value="Thiết bị">Thiết bị</option>
+                            <option value="Cảm biến">Cảm biến</option>
+                            <option value="Tài liệu">Tài liệu</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-5 top-5 text-gray-500"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-6">
+                <button type="button" onclick="closeModal()" class="flex-1 py-4 rounded-2xl font-bold bg-white/5 hover:bg-white/10 transition">Hủy bỏ</button>
+                <button type="submit" class="flex-1 py-4 rounded-2xl font-bold bg-gold text-black hover:bg-yellow-500 transition flex items-center justify-center gap-2 shadow-xl shadow-yellow-500/20">
+                    <i class="fas fa-save"></i> Thêm thiết bị
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalEdit" th:classappend="${openEditModal} ? '' : 'hidden'"
+     class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-card w-full max-w-lg rounded-[40px] border border-custom shadow-2xl overflow-hidden">
+        <div class="p-8 border-b border-custom flex justify-between items-center">
+            <h3 class="text-2xl font-bold">Chỉnh sửa thiết bị</h3>
+            <a th:href="@{/admin/equipments(page=${currentPage})}" class="text-gray-500 hover:text-white">
+                <i class="fas fa-times"></i>
+            </a>
+        </div>
+
+        <form th:action="@{/admin/update(page=${currentPage})}" th:object="${equipment}" method="post" class="p-10 space-y-6">
+            <input type="hidden" th:field="*{id}">
+
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 uppercase mb-3">Tên thiết bị</label>
+                <input type="text" th:field="*{name}" class="w-full bg-main border border-custom rounded-2xl p-4 text-white">
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase mb-3">Số lượng</label>
+                    <input type="number" th:field="*{quantity}" class="w-full bg-main border border-custom rounded-2xl p-4 text-white">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase mb-3">Danh mục</label>
+                    <select th:field="*{categoryName}" class="w-full bg-main border border-custom rounded-2xl p-4 text-white appearance-none">
+                        <option value="Vi điều khiển">Vi điều khiển</option>
+                        <option value="Linh kiện">Linh kiện</option>
+                        <option value="Thiết bị">Thiết bị</option>
+                        <option value="Cảm biến">Cảm biến</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-6">
+                <a th:href="@{/admin/equipments(page=${currentPage})}" class="flex-1 py-4 text-center rounded-2xl font-bold bg-white/5 hover:bg-white/10 transition">Hủy</a>
+                <button type="submit" class="flex-1 py-4 rounded-2xl font-bold bg-gold text-black hover:bg-yellow-500 transition">Cập nhật</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalDelete" th:classappend="${openDeleteModal} ? '' : 'hidden'"
+     class="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+    <div class="bg-card w-full max-w-md rounded-[32px] border border-custom shadow-2xl overflow-hidden scale-100 transition-all">
+        <div class="p-8 text-center">
+            <div class="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mx-auto mb-6 border border-red-500/20">
+                <i class="fas fa-exclamation-triangle text-3xl"></i>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-2">Xác nhận xóa?</h3>
+            <p class="text-gray-500 mb-8">
+                Bạn có chắc chắn muốn xóa thiết bị <br>
+                <span class="text-white font-bold" th:text="${deleteName}">Tên thiết bị</span>?
+            </p>
+
+            <div class="flex gap-4">
+                <a th:href="@{/admin/equipments(page=${currentPage})}"
+                   class="flex-1 py-4 rounded-2xl font-bold bg-white/5 hover:bg-white/10 transition text-center">
+                    Hủy bỏ
+                </a>
+
+                <a th:href="@{/admin/delete/{id}(id=${deleteId})}"
+                   class="flex-1 py-4 rounded-2xl font-bold bg-red-500 text-white hover:bg-red-600 transition flex items-center justify-center shadow-xl shadow-red-500/20">
+                    Xác nhận xóa
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:if="${success}" id="toast-success"
+     class="fixed top-5 right-5 z-[100] flex items-center w-full max-w-xs p-4 rounded-2xl bg-card border border-green-500/50 shadow-2xl animate-bounce-in">
+    <div class="inline-flex items-center justify-center flex-shrink-0 w-10 h-10 text-green-500 bg-green-500/10 rounded-xl">
+        <i class="fas fa-check"></i>
+    </div>
+    <div class="ml-3 text-sm font-bold text-gray-200" th:text="${success}">Thông báo ở đây</div>
+    <button type="button" onclick="this.parentElement.remove()" class="ml-auto text-gray-500 hover:text-white transition">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+
+<script th:inline="javascript">
+    window.onload = function() {
+        let shouldOpen = [[${openModal}]];
+        if (shouldOpen) {
+            openModal();
+        }
+
+        let toast = document.getElementById('toast-success');
+        if (toast) {
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-10');
+                toast.style.transition = 'all 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 2000);
+        }
+    };
+
+    function openModal() {
+        document.getElementById('modalAdd').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('modalAdd').classList.add('hidden');
+    }
+
+    function closeEditModal() {
+        document.getElementById('modalEdit').classList.add('hidden');
+    }
+
+
+    window.onclick = function(event) {
+        const addModal = document.getElementById('modalAdd');
+        if (event.target == addModal) closeModal();
+    }
+</script>
+
+</body>
+</html>

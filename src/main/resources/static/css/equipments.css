@@ -1,0 +1,40 @@
+:root {
+    --bg-main: #0b0d14;
+    --bg-sidebar: #11131f;
+    --bg-card: #151823;
+    --primary-gold: #ffb142;
+    --border-custom: #252936;
+    --text-gray: #94a3b8;
+}
+body { background-color: var(--bg-main); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+.bg-sidebar { background-color: var(--bg-sidebar); }
+.bg-card { background-color: var(--bg-card); }
+.border-custom { border-color: var(--border-custom); }
+.text-gold { color: var(--primary-gold); }
+.bg-gold { background-color: var(--primary-gold); }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 10px; }
+
+.progress-bar { background: #252936; height: 6px; border-radius: 10px; overflow: hidden; width: 100px; }
+
+input, select {
+    color: #e2e8f0 !important;
+    background-color: #0b0d14 !important;
+}
+
+input:focus, select:focus {
+    background-color: #1a1d29 !important;
+    border-color: #ffb142 !important;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 177, 66, 0.2);
+}
+
+input::placeholder {
+    color: #4a5568 !important;
+}
+
+select option {
+    background-color: #151823;
+    color: white;
+}

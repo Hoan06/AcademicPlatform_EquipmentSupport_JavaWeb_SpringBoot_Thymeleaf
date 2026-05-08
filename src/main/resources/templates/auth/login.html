@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<div class="info-section">
+
+    <h1 class="main-title">
+        Nền tảng <br>
+        <span class="highlight">thông minh</span>
+    </h1>
+    <p style="margin-top: 20px; color: var(--text-gray); max-width: 400px;">
+        Đặt lịch tư vấn, quản lý thiết bị thực hành và theo dõi hành trình học tập của bạn trên một nền tảng duy nhất.
+    </p>
+
+    <div class="features">
+        <div class="feature-item">
+            <i class="fas fa-graduation-cap" style="color: var(--primary-gold);"></i>
+            <div>
+                <div style="font-weight: bold;">Tư vấn học tập</div>
+                <div style="font-size: 0.8rem; color: var(--text-gray);">Đặt lịch với giảng viên, không xung đột thời gian</div>
+            </div>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-microscope" style="color: var(--primary-gold);"></i>
+            <div>
+                <div style="font-weight: bold;">Quản lý Lab</div>
+                <div style="font-size: 0.8rem; color: var(--text-gray);">Mượn thiết bị & tài liệu thực hành tự động</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="login-section">
+    <div class="auth-container">
+        <div class="tabs">
+            <div class="tab active"><a th:href="@{/auth/login}">Đăng nhập</a></div>
+            <div class="tab"><a th:href="@{/auth/register}">Đăng ký</a></div>
+        </div>
+
+        <h2 style="margin-bottom: 10px;">Chào mừng trở lại</h2>
+        <p style="color: var(--text-gray); font-size: 0.9rem; margin-bottom: 30px;">
+            Đăng nhập để tiếp tục hành trình học tập
+        </p>
+
+        <form th:action="@{/auth/login}" th:object="${user}" method="post">
+
+            <div class="input-group">
+                <label>Vai trò</label>
+                <div class="role-selector">
+                    <input type="radio" th:field="*{role}" value="user" id="roleUser" class="role-radio" hidden>
+                    <label for="roleUser" class="role-item">
+                        <i class="fas fa-user-graduate"></i>
+                        <div style="font-size: 0.65rem; margin-top: 3px;">Sinh viên</div>
+                    </label>
+
+                    <input type="radio" th:field="*{role}" value="lecturer" id="roleLecturer" class="role-radio" hidden>
+                    <label for="roleLecturer" class="role-item">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <div style="font-size: 0.65rem; margin-top: 3px;">Giảng viên</div>
+                    </label>
+
+                    <input type="radio" th:field="*{role}" value="admin" id="roleAdmin" class="role-radio" hidden>
+                    <label for="roleAdmin" class="role-item">
+                        <i class="fas fa-cube"></i>
+                        <div style="font-size: 0.65rem; margin-top: 3px;">Admin</div>
+                    </label>
+                </div>
+                <div th:if="${#fields.hasErrors('role')}" style="color: #e74c3c; font-size: 0.8rem; margin-top: 5px;">
+                    <span th:errors="*{role}"></span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Tài khoản</label>
+                <input type="text" th:field="*{username}" placeholder="SV2024001">
+                <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color: red"></small>
+            </div>
+
+            <div class="input-group">
+                <label>Mật khẩu</label>
+                <div style="position: relative;">
+                    <input type="password" th:field="*{password}" placeholder="••••••••">
+                    <i class="far fa-eye" style="position: absolute; right: 15px; top: 18px; color: #555; cursor: pointer;"></i>
+                    <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color: red"></small>
+                </div>
+            </div>
+
+            <div style="text-align: right; margin-top: -10px;">
+                <a href="#" style="color: var(--primary-gold); font-size: 0.8rem; text-decoration: none;">Quên mật khẩu?</a>
+            </div>
+
+            <button type="submit" class="btn-login">
+                Đăng nhập <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+            </button>
+
+            <div class="footer-links">
+                Chưa có tài khoản? <a th:href="@{/auth/register}">Đăng ký ngay</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+    <div th:if="${error}" class="toast error">
+        <i class="fas fa-exclamation-circle"></i>
+        <span th:text="${error}"></span>
+    </div>
+
+    <div th:if="${success}" class="toast success">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${success}"></span>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toasts = document.querySelectorAll('.toast');
+
+        toasts.forEach(toast => {
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, 2000);
+        });
+    });
+</script>
+
+</body>
+</html>

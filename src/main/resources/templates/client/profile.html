@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hồ sơ cá nhân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+<aside class="w-72 bg-custom-sidebar border-r border-white/5 flex flex-col">
+    <div class="p-8">
+        <div class="flex items-center gap-3 text-emerald-400 font-bold tracking-widest text-sm">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Sinh Viên</span>
+        </div>
+    </div>
+
+    <nav class="flex-1 px-4 space-y-2">
+
+        <a href="#" class="flex items-center gap-4 p-4 text-gray-400 hover:bg-white/5 rounded-2xl transition-all group">
+            <i class="fas fa-th-large group-hover:text-white"></i>
+            <span>Bảng điều khiển</span>
+        </a>
+
+        <a th:href="@{/client/booking}" class="flex items-center gap-4 p-4 text-gray-400 hover:bg-white/5 rounded-2xl transition-all group">
+            <i class="far fa-calendar-alt group-hover:text-white"></i>
+            <span>Đặt lịch tư vấn</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-4 p-4 text-gray-400 hover:bg-white/5 rounded-2xl transition-all group">
+            <i class="fas fa-book group-hover:text-white"></i>
+            <span>Lịch sử học tập</span>
+        </a>
+
+        <a th:href="@{/client/profile}" class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border-l-4 border-gold text-white group transition-all">
+            <div class="flex items-center gap-4">
+                <i class="fas fa-user text-gold"></i>
+                <span class="font-medium">Hồ sơ cá nhân</span>
+            </div>
+        </a>
+
+    </nav>
+
+    <div class="px-4 py-6 border-t border-white/5 space-y-2">
+        <a href="#" class="flex items-center justify-between p-4 text-gray-400 hover:bg-white/5 rounded-2xl transition-all">
+            <div class="flex items-center gap-4">
+                <i class="far fa-bell"></i>
+                <span>Thông báo</span>
+            </div>
+            <span class="bg-gold/20 text-gold text-[10px] font-bold px-2 py-0.5 rounded-full">2</span>
+        </a>
+        <a href="#" class="flex items-center gap-4 p-4 text-gray-400 hover:bg-white/5 rounded-2xl transition-all">
+            <i class="fas fa-cog"></i>
+            <span>Cài đặt</span>
+        </a>
+    </div>
+
+    <div class="p-4 border-t border-white/5 bg-black/20">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full overflow-hidden border border-white/10 flex items-center justify-center bg-gold text-black font-bold">
+                    <img th:if="${userImage != null and userImage != ''}"
+                         th:src="${userImage}"
+                         class="w-full h-full object-cover">
+
+                    <span th:unless="${userImage != null and userImage != ''}"
+                          th:text="${#strings.substring(userDTO.fullName,0,1)}">N</span>
+                </div>
+
+                <div>
+                    <p class="text-sm font-bold text-white truncate w-32" th:text="${userDTO.fullName}">Nguyễn Văn An</p>
+                    <p class="text-[10px] text-gray-500 uppercase" th:text="${userDTO.username}">SV2024001</p>
+                </div>
+            </div>
+
+            <a th:href="@{/auth/logout}" class="text-gray-500 hover:text-white transition-all">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<main class="flex-1 overflow-y-auto p-10 bg-[#0F1117]">
+    <div class="max-w-4xl mx-auto">
+        <header class="mb-10">
+            <h2 class="text-3xl font-bold tracking-tight">Hồ sơ cá nhân</h2>
+            <p class="text-gray-400 mt-2">Quản lý thông tin tài khoản và tùy chỉnh giao diện của bạn.</p>
+        </header>
+
+        <form th:action="@{/client/update}" th:object="${userDTO}" method="post" enctype="multipart/form-data">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-custom-card p-8 rounded-[32px] border border-white/5 flex flex-col items-center">
+                    <div class="relative group">
+                        <img id="previewImage"
+                             th:src="${userImage != null ? userImage : '/images/default-avatar.png'}"
+                             class="w-40 h-40 rounded-full object-cover border-4 border-white/10 group-hover:border-gold transition-all">
+
+                        <label for="imageUpload" class="absolute bottom-1 right-1 bg-gold text-black p-3 rounded-full cursor-pointer hover:scale-110 transition active:scale-95 shadow-lg">
+                            <i class="fas fa-camera"></i>
+                            <input type="file" id="imageUpload" name="imageFile" class="hidden" accept="image/*" onchange="previewFile()">
+                        </label>
+                    </div>
+                    <p class="mt-6 text-sm text-gray-400 text-center">Tải lên ảnh mới (JPG, PNG). Tối đa 2MB.</p>
+                </div>
+
+                <div class="md:col-span-2 space-y-6">
+                    <div class="bg-custom-card p-8 rounded-[32px] border border-white/5 space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">Tên đăng nhập</label>
+                                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 text-gray-400 flex items-center gap-3">
+                                    <i class="fas fa-user-lock text-xs"></i>
+                                    <span th:text="*{username}">username</span>
+                                </div>
+                                <input type="hidden" th:field="*{username}">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2">Vai trò</label>
+                                <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+                                    <span class="px-3 py-1 bg-white/10 rounded-full text-[10px] font-bold text-gold uppercase tracking-wider" th:text="*{role}">USER</span>
+                                </div>
+                                <input type="hidden" th:field="*{role}">
+                            </div>
+                        </div>
+
+                        <hr class="border-white/5">
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-gold uppercase tracking-widest mb-2">Họ và tên</label>
+                            <input type="text" th:field="*{fullName}"
+                                   class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 focus:outline-none focus:border-gold transition-all text-white"
+                                   placeholder="Nhập họ tên...">
+                        </div>
+
+                        <div class="flex justify-end pt-4">
+                            <button type="submit" class="bg-gold hover:bg-yellow-500 text-black font-bold py-4 px-10 rounded-2xl flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-gold/10">
+                                <i class="fas fa-save"></i>
+                                Lưu thay đổi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+
+<script>
+    function previewFile() {
+        const preview = document.querySelector('#previewImage');
+        const file = document.querySelector('#imageUpload').files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => preview.src = reader.result;
+        if (file) reader.readAsDataURL(file);
+    }
+</script>
+</body>
+</html>

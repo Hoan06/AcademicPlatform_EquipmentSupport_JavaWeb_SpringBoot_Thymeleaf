@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bảng điều khiển Giảng viên</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#f59e0b',
+                        main: '#0b0d11',
+                        sidebar: '#12141a',
+                        card: '#181b22',
+                    }
+                }
+            }
+        }
+    </script>
+
+</head>
+<body class="flex h-screen overflow-hidden font-sans bg-main">
+
+<aside class="w-72 bg-sidebar border-r border-white/5 flex flex-col">
+    <div class="p-8">
+        <div class="flex items-center gap-3 text-gold font-bold tracking-widest text-sm">
+            <i class="fas fa-graduation-cap"></i>
+            <span>GIẢNG VIÊN</span>
+        </div>
+    </div>
+
+    <nav class="flex-1 px-4 space-y-2">
+        <a href="#" class="flex items-center gap-4 p-4 text-white bg-white/5 rounded-2xl border-l-4 border-gold shadow-lg transition-all">
+            <i class="fas fa-calendar-check group-hover:text-white"></i>
+            <span class="font-bold">Ca tư vấn chờ</span>
+        </a>
+
+        <a th:href="@{/lecturer/profile}" class="flex items-center gap-4 p-4 text-gray-400 hover:bg-white/5 rounded-2xl transition-all group">
+            <i class="fas fa-user-circle group-hover:text-white"></i>
+            <span>Hồ sơ cá nhân</span>
+        </a>
+    </nav>
+
+    <div class="p-4 border-t border-white/5 bg-black/20">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full overflow-hidden border border-white/10 flex items-center justify-center bg-gold text-black font-bold">
+                    <img th:if="${userImage != null and userImage != ''}" th:src="${userImage}" class="w-full h-full object-cover">
+                    <span th:unless="${userImage != null and userImage != ''}" th:text="${#strings.substring(userDTO.fullName,0,1)}">T</span>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-white truncate w-32" th:text="${userDTO.fullName}">Giảng viên</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-tighter" th:text="${userDTO.username}">LECTURER</p>
+                </div>
+            </div>
+            <a th:href="@{/auth/logout}" class="text-gray-500 hover:text-white">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<main class="flex-1 overflow-y-auto p-12 no-scrollbar">
+    <header class="mb-10">
+        <h2 class="text-3xl font-bold mb-2 text-white">Bảng điều khiển</h2>
+        <p class="text-gray-500 text-sm font-medium">Thứ 3, 06/05/2026 · Bộ môn Công nghệ Phần mềm</p>
+    </header>
+
+    <div class="grid grid-cols-12 gap-8">
+
+        <div class="col-span-12 lg:col-span-5">
+            <div class="bg-card rounded-[32px] p-6 border border-white/5 shadow-2xl">
+                <div class="flex items-center justify-between mb-8 px-2">
+                    <h3 class="text-lg font-bold">Ca tư vấn chờ xử lý</h3>
+                    <div class="w-2 h-2 rounded-full bg-gold animate-pulse shadow-[0_0_10px_#f59e0b]"></div>
+                </div>
+
+                <div class="space-y-3">
+                    <a th:each="sess : ${pendingSessions}"
+                       th:href="@{/lecturer/dashboard(sessionId=${sess.id})}"
+                       th:classappend="${activeSession != null && activeSession.id == sess.id} ? 'bg-white/10 border-gold/50 shadow-xl' : 'hover:bg-white/5 border-transparent'"
+                       class="flex items-center gap-5 p-5 rounded-[24px] border transition-all duration-300 block group">
+
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg bg-gold text-black shadow-lg"
+                             th:text="${#strings.substring(sess.student.profile.fullName,0,1)}">N</div>
+
+                        <div class="flex-1 overflow-hidden">
+                            <p class="font-bold text-white text-sm truncate" th:text="${sess.student.profile.fullName}">Nguyễn Văn An</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <p class="text-[11px] text-gray-400 font-bold uppercase tracking-tighter"
+                                   th:text="${#temporals.format(sess.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(sess.endTime, 'HH:mm')}">09:00</p>
+                                <span class="text-gray-700">|</span>
+                                <p class="text-[11px] text-gray-500 italic truncate" th:text="${sess.note}">Chủ đề tư vấn</p>
+                            </div>
+                        </div>
+
+                        <div class="w-2 h-2 rounded-full bg-gold transition-opacity"
+                             th:style="${activeSession != null && activeSession.id == sess.id ? 'opacity:1' : 'opacity:0.2'}"></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-span-12 lg:col-span-7">
+            <div th:if="${activeSession == null}" class="h-full min-h-[450px] flex flex-col items-center justify-center text-gray-600 bg-card/30 rounded-[32px] border-2 border-dashed border-white/5 p-12 text-center">
+                <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                    <i class="fas fa-mouse-pointer text-2xl text-gray-500"></i>
+                </div>
+                <p class="font-bold text-lg text-gray-400">Chưa có ca tư vấn nào được chọn</p>
+                <p class="text-sm mt-2 max-w-xs mx-auto">Chọn một sinh viên từ danh sách bên trái để bắt đầu nhập đánh giá năng lực.</p>
+            </div>
+
+            <div th:if="${activeSession != null}" class="bg-card rounded-[32px] p-10 border border-white/5 shadow-2xl sticky top-4">
+                <div class="mb-10">
+                    <h3 class="text-2xl font-bold text-white mb-2">
+                        Nhập đánh giá — <span class="text-gold" th:text="${activeSession.student.profile.fullName}">Sinh viên</span>
+                    </h3>
+                    <div class="flex items-center gap-4 text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                        <span th:text="${activeSession.student.username}">MSV</span>
+                        <span class="w-1 h-1 rounded-full bg-gray-700"></span>
+                        <span th:text="${#temporals.format(activeSession.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(activeSession.endTime, 'HH:mm')}">Time</span>
+                    </div>
+                </div>
+
+                <form th:action="@{/lecturer/complete-session}" method="post" class="space-y-10">
+                    <input type="hidden" name="sessionId" th:value="${activeSession.id}">
+
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center">
+                            <label class="text-[12px] font-bold text-gray-400 uppercase tracking-[3px]">Điểm năng lực tổng quát</label>
+                            <div class="w-16 h-16 bg-gold rounded-2xl flex items-center justify-center text-black font-black text-2xl shadow-xl shadow-gold/20" id="scoreDisplay">80</div>
+                        </div>
+                        <input type="range" name="score" min="0" max="100" value="80" class="w-full" oninput="document.getElementById('scoreDisplay').innerText = this.value">
+                        <div class="flex justify-between text-[10px] text-gray-600 font-black uppercase">
+                            <span>Cần cải thiện</span>
+                            <span>Xuất sắc</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="text-[12px] font-bold text-gray-400 uppercase tracking-[3px]">Nhận xét của giảng viên</label>
+                        <textarea name="feedback" placeholder="Nhập nhận xét chi tiết..."
+                                  class="w-full bg-main border border-white/5 rounded-2xl p-6 text-sm text-white focus:border-gold outline-none min-h-[160px] resize-none transition-all shadow-inner"></textarea>
+                    </div>
+
+                    <div class="space-y-5">
+                        <label class="text-[12px] font-bold text-gray-400 uppercase tracking-[3px] flex items-center gap-3">
+                            <i class="fas fa-boxes text-gold"></i> Thiết bị chỉ định
+                        </label>
+                        <div class="flex flex-wrap gap-3">
+                            <button type="button" class="px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-[11px] text-gray-400 hover:border-gold hover:text-white transition-all">
+                                <i class="fas fa-plus mr-2 opacity-50"></i> Arduino Uno R3 <span class="ml-1 text-gold">(12)</span>
+                            </button>
+                            <button type="button" class="px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-[11px] text-gray-400 hover:border-gold hover:text-white transition-all">
+                                <i class="fas fa-plus mr-2 opacity-50"></i> Laptop Dell <span class="ml-1 text-gold">(4)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full py-6 bg-gold hover:bg-yellow-500 text-black font-black rounded-2xl transition-all shadow-2xl shadow-gold/20 flex items-center justify-center gap-3">
+                            <i class="fas fa-check-circle"></i>
+                            HOÀN TẤT VÀ LƯU ĐÁNH GIÁ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>
