@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Xuất kho - Hệ thống Thiết bị</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/loan_slip.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#ffb142',
+                        main: '#0b0d14',
+                        sidebar: '#11131f',
+                        card: '#151823',
+                        custom: '#252936',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="flex h-screen overflow-hidden font-sans bg-main text-gray-300">
+
+<aside class="w-72 bg-sidebar border-r border-custom flex flex-col">
+    <div class="p-8">
+        <div class="mb-2 font-bold text-xl tracking-tighter italic text-white">
+        </div>
+    </div>
+
+    <nav class="flex-1 px-6 space-y-1">
+        <p class="text-gray-600 text-[11px] font-bold uppercase mb-4 px-2 tracking-widest">Quản trị</p>
+
+        <a th:href="@{/admin/dashboardAdmin}" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition">
+            <i class="fas fa-th-large w-8 text-center mr-2"></i> Bảng điều khiển
+        </a>
+
+        <a th:href="@{/admin/equipments}" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition">
+            <i class="fas fa-box w-8 text-center mr-2"></i> Thiết bị & Tài liệu
+        </a>
+
+        <a th:href="@{/admin/users}" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition">
+            <i class="fas fa-users w-8 text-center mr-2"></i> Người dùng
+        </a>
+
+        <a th:href="@{/admin/loanSlip}" class="flex items-center text-white bg-white/5 border-r-4 border-gold p-3 rounded-xl justify-between">
+            <span><i class="fas fa-file-invoice w-8 text-center mr-2 text-gold"></i> Phiếu mượn</span>
+            <span class="bg-gold text-black text-[10px] px-2 py-0.5 rounded-full font-bold" th:text="${pendingRecords.size()}">5</span>
+        </a>
+    </nav>
+
+    <div class="p-6 border-t border-custom mt-auto">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">A</div>
+            <div class="flex-1">
+                <p class="text-sm font-bold">Admin Hệ thống</p>
+                <p class="text-[10px] text-gray-500 uppercase" th:text="${userLogin}"></p>
+            </div>
+            <a th:href="@{/auth/logout}" class="text-gray-500 hover:text-white transition-all">
+                <i  class="fas fa-sign-out-alt text-gray-500 cursor-pointer hover:text-white"></i>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<main class="flex-1 overflow-y-auto p-12 no-scrollbar">
+    <header class="mb-10">
+        <h2 class="text-3xl font-bold mb-2 text-white">Quản lý Phiếu mượn</h2>
+        <p class="text-gray-500 text-sm font-medium">Danh sách các yêu cầu mượn thiết bị đang chờ xuất kho hoặc đang xử lý.</p>
+    </header>
+
+    <div class="grid grid-cols-12 gap-8">
+
+        <div class="col-span-12 lg:col-span-5">
+            <div class="bg-card rounded-[32px] p-6 border border-white/5 shadow-2xl">
+                <div class="flex items-center justify-between mb-8 px-2">
+                    <h3 class="text-lg font-bold text-white">Phiếu mượn chờ xử lý</h3>
+                    <div class="w-2 h-2 rounded-full bg-gold animate-pulse shadow-[0_0_10px_#f59e0b]"></div>
+                </div>
+
+                <div class="space-y-3">
+                    <a th:each="record : ${pendingRecords}"
+                       th:href="@{/admin/loanSlip(recordId=${record.id})}"
+                       th:classappend="${activeRecord != null && activeRecord.id == record.id} ? 'bg-white/10 border-gold/50 shadow-xl' : 'hover:bg-white/5 border-transparent'"
+                       class="flex flex-col p-5 rounded-[24px] border transition-all duration-300 block group">
+
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold text-gray-500 tracking-widest uppercase" th:text="'#BR-' + ${record.id}">#BR-000</span>
+                            <span class="text-[10px] text-gold font-bold uppercase tracking-tighter"
+                                  th:text="${#temporals.format(record.session.startTime, 'dd/MM/yyyy')}">Date</span>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg bg-white/5 text-gold border border-white/10"
+                                 th:text="${#strings.substring(record.session.student.profile.fullName,0,1)}">N</div>
+                            <div class="flex-1 overflow-hidden">
+                                <p class="font-bold text-white text-sm truncate" th:text="${record.session.student.profile.fullName}">Sinh viên</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-tighter" th:text="${record.session.student.username}">MSV</p>
+                                    <span class="text-gray-700">|</span>
+                                    <p class="text-[11px] text-gray-500 italic truncate" th:text="${record.details.size()} + ' thiết bị'">0 TB</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="text-[11px] font-bold text-gold">Chi tiết <i class="fas fa-arrow-right ml-1"></i></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-span-12 lg:col-span-7">
+
+            <div th:if="${activeRecord == null}" class="h-full min-h-[500px] flex flex-col items-center justify-center text-gray-600 bg-card/30 rounded-[32px] border-2 border-dashed border-white/5 p-12 text-center">
+                <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 text-gray-500">
+                    <i class="fas fa-file-invoice text-3xl"></i>
+                </div>
+                <p class="font-bold text-lg text-gray-400">Chưa có phiếu được chọn</p>
+                <p class="text-sm mt-2 max-w-xs mx-auto">Vui lòng chọn một phiếu mượn bên danh sách để xem chi tiết vật tư và phê duyệt xuất kho.</p>
+            </div>
+
+            <div th:if="${activeRecord != null}" class="bg-card rounded-[32px] p-10 border border-white/5 shadow-2xl sticky top-4 animate-fadeIn">
+                <div class="flex justify-between items-start mb-10">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Chi tiết phiếu mượn</h3>
+                        <div class="flex items-center gap-3">
+                            <span class="px-3 py-1 bg-gold/10 text-gold text-[10px] font-bold rounded-full border border-gold/20 uppercase tracking-widest" th:text="${activeRecord.status}">PENDING</span>
+                            <span class="text-[11px] font-bold text-gray-500 tracking-widest uppercase" th:text="'#BR-' + ${activeRecord.id}">#BR-000</span>
+                        </div>
+                    </div>
+                    <a th:href="@{/admin/loanSlip}" class="text-gray-500 hover:text-white transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8 mb-10 pb-8 border-b border-white/5">
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Thông tin người mượn</p>
+                        <p class="text-white font-bold text-lg" th:text="${activeRecord.session.student.profile.fullName}">Họ tên</p>
+                        <p class="text-xs text-gray-500" th:text="'Mã định danh: ' + ${activeRecord.session.student.username}">Username</p>
+                    </div>
+                    <div class="space-y-1 text-right">
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Thời gian đăng ký</p>
+                        <p class="text-white font-bold text-lg"
+                           th:text="${#temporals.format(activeRecord.session.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(activeRecord.session.endTime, 'HH:mm')}">Time</p>
+                        <p class="text-xs text-gold font-medium" th:text="${#temporals.format(activeRecord.session.startTime, 'dd/MM/yyyy')}">Date</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <label class="text-[12px] font-bold text-gray-400 uppercase tracking-[3px]">Danh sách thiết bị yêu cầu</label>
+
+                    <div class="space-y-3">
+                        <div th:each="detail : ${activeRecord.details}" class="grid grid-cols-12 gap-4 p-4 bg-main rounded-2xl border border-white/5 items-center">
+                            <div class="col-span-7">
+                                <p class="text-sm font-bold text-white" th:text="${detail.equipment.name}">Tên thiết bị</p>
+                                <p class="text-[10px] text-gray-500 uppercase" th:text="'Loại: ' + ${detail.equipment.id}">Phân loại</p>
+                            </div>
+                            <div class="col-span-3 text-center">
+                                <p class="text-xs text-gray-400 mb-1">Số lượng</p>
+                                <span class="px-4 py-1 rounded-lg font-black text-sm"
+                                      th:classappend="${detail.quantity > detail.equipment.available} ? 'bg-red-500/20 text-red-500 border border-red-500/50' : 'bg-white/5 text-gold'"
+                                      th:text="${#numbers.formatInteger(detail.quantity, 2)}">01</span>
+                            </div>
+                            <div class="col-span-2 text-right">
+                                <i th:if="${detail.quantity <= detail.equipment.available}"
+                                   class="fas fa-check-circle text-green-500 text-lg"
+                                   title="Đủ hàng trong kho"></i>
+
+                                <i th:if="${detail.quantity > detail.equipment.available}"
+                                   class="fas fa-exclamation-triangle text-red-500 text-lg animate-pulse"
+                                   th:title="'Thiếu hàng! Kho chỉ còn: ' + ${detail.equipment.available}"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form th:action="@{/admin/loanSlip/confirm}" method="post" class="mt-12 flex gap-4">
+                    <input type="hidden" name="recordId" th:value="${activeRecord.id}">
+
+                    <button type="submit"
+                            class="flex-1 py-5 bg-gold hover:bg-yellow-500 text-black font-black rounded-2xl transition-all shadow-lg flex items-center justify-center gap-3">
+                        <i class="fas fa-box-open"></i> XÁC NHẬN XUẤT KHO
+                    </button>
+
+                    <button type="button"
+                            onclick="openRejectModal()"
+                            class="w-20 py-5 bg-white/5 hover:bg-red-500/20 text-gray-500 hover:text-red-500 rounded-2xl transition-all border border-white/5 flex items-center justify-center group"
+                            title="Từ chối yêu cầu">
+                        <i class="fas fa-ban group-hover:scale-110 transition"></i>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="fixed top-8 right-8 z-50 flex flex-col gap-4">
+        <div th:if="${success}" id="toast-success"
+             class="flex items-center p-4 min-w-[300px] bg-card border border-green-500/30 rounded-2xl shadow-2xl animate-slideInRight">
+            <div class="flex items-center justify-center w-10 h-10 bg-green-500/20 rounded-xl mr-4">
+                <i class="fas fa-check text-green-500"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Thành công</p>
+                <p class="text-sm text-white font-medium" th:text="${success}"></p>
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-4 text-gray-600 hover:text-white transition">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div th:if="${error}" id="toast-error"
+             class="flex items-center p-4 min-w-[300px] bg-card border border-red-500/30 rounded-2xl shadow-2xl animate-slideInRight">
+            <div class="flex items-center justify-center w-10 h-10 bg-red-500/20 rounded-xl mr-4">
+                <i class="fas fa-exclamation-triangle text-red-500"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Lỗi hệ thống</p>
+                <p class="text-sm text-white font-medium" th:text="${error}"></p>
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-4 text-gray-600 hover:text-white transition">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="rejectModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-main/80 backdrop-blur-sm"></div>
+
+        <div class="relative bg-card border border-white/10 w-full max-w-md rounded-[32px] p-8 shadow-2xl scale-95 transition-all duration-300">
+            <div class="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                <i class="fas fa-exclamation-circle text-2xl text-red-500"></i>
+            </div>
+
+            <h3 class="text-xl font-bold text-white text-center mb-2">Xác nhận từ chối?</h3>
+            <p class="text-gray-400 text-center text-sm mb-8 leading-relaxed">
+                Hành động này sẽ hủy yêu cầu mượn thiết bị. Bạn có chắc chắn muốn tiếp tục không?
+            </p>
+
+            <div class="flex gap-3">
+                <button type="button" onclick="closeRejectModal()"
+                        class="flex-1 py-4 bg-white/5 hover:bg-white/10 text-gray-400 font-bold rounded-2xl transition-all">
+                    Hủy bỏ
+                </button>
+                <button type="button" id="confirmRejectBtn"
+                        class="flex-1 py-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-2xl transition-all shadow-lg shadow-red-500/20">
+                    Đồng ý từ chối
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    const modal = document.getElementById('rejectModal');
+    const modalContent = modal.querySelector('.relative');
+
+    function openRejectModal() {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeRejectModal() {
+        modalContent.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 200);
+    }
+
+    document.getElementById('confirmRejectBtn').addEventListener('click', function() {
+        const form = document.querySelector('form[action*="/admin/loanSlip/confirm"]');
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'action';
+
+        form.action = '/admin/loanSlip/reject';
+        form.submit();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const toasts = document.querySelectorAll('#toast-success, #toast-error');
+        toasts.forEach(toast => {
+            setTimeout(() => {
+                toast.classList.add('toast-fade-out');
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, 2000);
+        });
+    });
+</script>
+</body>
+</html>

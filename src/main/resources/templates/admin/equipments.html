@@ -17,7 +17,7 @@
 
     <nav class="flex-1 px-6 space-y-1">
         <p class="text-gray-600 text-[11px] font-bold uppercase mb-4 px-2 tracking-widest">Quản trị</p>
-        <a href="#" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition">
+        <a th:href="@{/admin/dashboardAdmin}" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition">
             <i class="fas fa-th-large w-8 text-center mr-2"></i> Bảng điều khiển
         </a>
         <a th:href="@{/admin/equipments}" class="flex items-center text-white bg-white/5 border-r-4 border-gold p-3 rounded-xl">
@@ -26,9 +26,9 @@
         <a th:href="@{/admin/users}" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition">
             <i class="fas fa-users w-8 text-center mr-2"></i> Người dùng
         </a>
-        <a href="#" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition justify-between">
+        <a th:href="@{/admin/loanSlip}" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition justify-between">
             <span><i class="fas fa-file-invoice w-8 text-center mr-2"></i> Phiếu mượn</span>
-            <span class="bg-gold text-black text-[10px] px-2 py-0.5 rounded-full font-bold">5</span>
+            <span class="bg-gold text-black text-[10px] px-2 py-0.5 rounded-full font-bold" th:text="${pendingRecords.size()}">5</span>
         </a>
     </nav>
 
@@ -58,23 +58,29 @@
     </header>
 
     <div class="px-10 flex items-center gap-4 mb-8">
-        <div class="relative flex-1 max-w-sm">
+        <form th:action="@{/admin/equipments}" method="get" class="relative flex-1 max-w-sm">
             <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"></i>
-            <input type="text" placeholder="Tìm tên hoặc mã thiết bị..." class="w-full bg-card border border-custom rounded-2xl py-4 pl-14 pr-4 text-sm focus:outline-none focus:border-gold/50 transition">
-        </div>
+            <input type="text" name="search" th:value="${search}"
+                   placeholder="Tìm tên hoặc mã thiết bị..."
+                   class="w-full bg-card border border-custom rounded-2xl py-4 pl-14 pr-4 text-sm focus:outline-none focus:border-gold/50 transition">
+            <input type="hidden" name="category" th:value="${category}">
+        </form>
+
         <div class="flex bg-card p-1.5 rounded-2xl border border-custom">
-            <button class="px-6 py-2.5 bg-gray-700/50 rounded-xl text-sm font-medium">Tất cả</button>
-            <button class="px-6 py-2.5 text-gray-500 hover:text-white text-sm transition">Vi điều khiển</button>
-            <button class="px-6 py-2.5 text-gray-500 hover:text-white text-sm transition">Linh kiện</button>
-            <button class="px-6 py-2.5 text-gray-500 hover:text-white text-sm transition">Thiết bị</button>
-            <button class="px-6 py-2.5 text-gray-500 hover:text-white text-sm transition">Cảm biến</button>
+            <th:block th:each="cat : ${categories}">
+                <a th:href="@{/admin/equipments(category=${cat}, search=${search})}"
+                   th:text="${cat}"
+                   th:classappend="${category == cat} ? 'bg-gray-700/50 text-white' : 'text-gray-500 hover:text-white'"
+                   class="px-6 py-2.5 rounded-xl text-sm font-medium transition">
+                </a>
+            </th:block>
         </div>
     </div>
 
     <div class="px-10 pb-10">
         <div class="bg-card border border-custom rounded-[32px] overflow-hidden">
             <table class="w-full text-left">
-                <thead class="border-b border-custom">
+                <thead class="border-b border-white/[0.05]">
                 <tr class="text-[11px] text-gray-500 uppercase tracking-[2px]">
                     <th class="px-8 py-6">Thiết bị / Tài liệu</th>
                     <th class="px-8 py-6">Mã thiết bị / Danh mục</th>
@@ -83,7 +89,7 @@
                     <th class="px-8 py-6"></th>
                 </tr>
                 </thead>
-                <tbody class="divide-y divide-custom">
+                <tbody class="divide-y divide-white/[0.05]">
                 <tr th:each="item : ${equipments}" class="hover:bg-white/[0.02] transition group">
                     <td class="px-8 py-6">
                         <div class="flex items-center gap-4">
@@ -138,30 +144,31 @@
                 </tbody>
             </table>
 
-            <div class="px-8 py-6 border-t border-custom flex items-center justify-between bg-card/50">
+            <div class="px-8 py-6 border-t border-white/5 flex items-center justify-between bg-card/50">
                 <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">
-                    Trang <span class="text-gray-300" th:text="${currentPage}">1</span> trên <span class="text-gray-300" th:text="${totalPages}">1</span>
+                    Trang <span class="text-gray-200" th:text="${currentPage}">1</span>
+                    trên <span class="text-gray-200" th:text="${totalPages}">1</span>
                 </p>
 
                 <div class="flex items-center gap-2">
-                    <a th:href="@{/admin/equipments(page=${currentPage - 1})}"
-                       th:classappend="${currentPage <= 1} ? 'opacity-20 pointer-events-none' : ''"
-                       class="w-10 h-10 rounded-xl border border-custom flex items-center justify-center text-gray-500 hover:bg-white/5 hover:text-white transition">
+                    <a th:href="@{/admin/equipments(page=${currentPage - 1}, search=${search}, category=${category})}"
+                       th:classappend="${currentPage <= 1} ? 'opacity-10 pointer-events-none' : ''"
+                       class="w-10 h-10 rounded-xl border border-white/5 flex items-center justify-center text-gray-500 hover:bg-white/5 hover:text-white transition">
                         <i class="fas fa-chevron-left text-xs"></i>
                     </a>
 
                     <div class="flex items-center gap-1">
                         <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-                           th:href="@{/admin/equipments(page=${i})}"
+                           th:href="@{/admin/equipments(page=${i}, search=${search}, category=${category})}"
                            th:text="${i}"
-                           th:classappend="${currentPage == i} ? 'bg-gold text-black shadow-lg shadow-yellow-500/20' : 'border border-custom text-gray-500 hover:bg-white/5 hover:text-white'"
+                           th:classappend="${currentPage == i} ? 'bg-gold text-black shadow-lg shadow-yellow-500/20' : 'border border-white/5 text-gray-500 hover:bg-white/5 hover:text-white'"
                            class="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold transition">
                         </a>
                     </div>
 
-                    <a th:href="@{/admin/equipments(page=${currentPage + 1})}"
-                       th:classappend="${currentPage >= totalPages} ? 'opacity-20 pointer-events-none' : ''"
-                       class="w-10 h-10 rounded-xl border border-custom flex items-center justify-center text-gray-500 hover:bg-white/5 hover:text-white transition">
+                    <a th:href="@{/admin/equipments(page=${currentPage + 1}, search=${search}, category=${category})}"
+                       th:classappend="${currentPage >= totalPages} ? 'opacity-10 pointer-events-none' : ''"
+                       class="w-10 h-10 rounded-xl border border-white/5 flex items-center justify-center text-gray-500 hover:bg-white/5 hover:text-white transition">
                         <i class="fas fa-chevron-right text-xs"></i>
                     </a>
                 </div>

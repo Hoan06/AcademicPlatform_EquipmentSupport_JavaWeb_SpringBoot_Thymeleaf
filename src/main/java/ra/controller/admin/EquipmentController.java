@@ -10,10 +10,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ra.model.dto.EquipmentDTO;
+import ra.model.entity.BorrowingRecord;
 import ra.model.entity.Equipment;
+import ra.service.BorrowingRecordService;
 import ra.service.EquipmentService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -21,29 +24,50 @@ public class EquipmentController {
     @Autowired
     private EquipmentService equipmentService;
 
-    @GetMapping("/equipments")
-    public String equipments(@RequestParam(defaultValue = "1") Integer page, Model model , HttpSession session) {
-        if (session.getAttribute("userLogin") == null) {
-            return "redirect:/auth/login";
-        }
-        Object user = session.getAttribute("userLogin");
-        Object role = session.getAttribute("role");
-        if(role != null && role.equals("user")){
-            return "redirect:/client/home";
-        } else if(role != null && role.equals("lecturer")){
-            return "redirect:/lecturer/home";
-        }
-        int size = 1;
-        Page<Equipment> equipmentPage = equipmentService.findAll(page, size);
+    @Autowired
+    private BorrowingRecordService borrowingRecordService;
 
-        model.addAttribute("userLogin", user.toString());
+
+
+    @GetMapping("/equipments")
+    public String equipments(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "Tất cả") String category,
+            Model model,
+            HttpSession session) {
+
+        int size = 5;
+
+        Page<Equipment> equipmentPage = equipmentService.searchEquipments(search, category, page, size);
+
+        model.addAttribute("userLogin", session.getAttribute("userLogin"));
         model.addAttribute("equipments", equipmentPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", equipmentPage.getTotalPages());
 
+        model.addAttribute("search", search);
+        model.addAttribute("category", category);
+
         if (!model.containsAttribute("equipment")) {
             model.addAttribute("equipment", new EquipmentDTO());
         }
+
+        List<String> categories = List.of(
+                "Tất cả",
+                "Vi điều khiển",
+                "Linh kiện",
+                "Thiết bị",
+                "Cảm biến"
+        );
+
+        model.addAttribute("categories", categories);
+
+        List<BorrowingRecord> pendingRecords = borrowingRecordService.getBorrowingRecordsByStatusPending();
+
+        if (pendingRecords == null) {
+            pendingRecords = new ArrayList<>();
+        }        model.addAttribute("pendingRecords", pendingRecords);
 
         return "admin/equipments";
     }
@@ -69,7 +93,7 @@ public class EquipmentController {
 
     @GetMapping("/delete-confirm/{id}")
     public String showDeleteConfirm(@PathVariable("id") Long id, @RequestParam(defaultValue = "1") Integer page, Model model, HttpSession session) {
-        int size = 1;
+        int size = 5;
         Page<Equipment> equipmentPage = equipmentService.findAll(page, size);
 
         Equipment equipment = equipmentService.findById(id);
@@ -85,21 +109,35 @@ public class EquipmentController {
 
         model.addAttribute("deleteName", equipment.getName());
 
+        List<BorrowingRecord> pendingRecords = borrowingRecordService.getBorrowingRecordsByStatusPending();
+        model.addAttribute("pendingRecords", pendingRecords != null ? pendingRecords : new ArrayList<>());
+
+        model.addAttribute("categories", List.of(
+                "Tất cả", "Vi điều khiển", "Linh kiện", "Thiết bị", "Cảm biến"
+        ));
+
         return "admin/equipments";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteEquipment(@PathVariable("id") Long id, RedirectAttributes redirectAttributes , HttpSession session) {
+    public String deleteEquipment(@PathVariable("id") Long id, RedirectAttributes redirectAttributes ,Model model, HttpSession session) {
         Equipment equipment = equipmentService.findById(id);
         equipment.setDelete(true);
         equipmentService.save(equipment);
         redirectAttributes.addFlashAttribute("success", "Xóa thiết bị thành công!");
+
+        List<BorrowingRecord> pendingRecords = borrowingRecordService.getBorrowingRecordsByStatusPending();
+        model.addAttribute("pendingRecords", pendingRecords != null ? pendingRecords : new ArrayList<>());
+
+        model.addAttribute("categories", List.of(
+                "Tất cả", "Vi điều khiển", "Linh kiện", "Thiết bị", "Cảm biến"
+        ));
         return "redirect:/admin/equipments";
     }
 
     @GetMapping("/update/{id}")
     public String updateEquipment(@PathVariable("id") Long id, @RequestParam(defaultValue = "1") Integer page, Model model, HttpSession session) {
-        int size = 1;
+        int size = 5;
         Page<Equipment> equipmentPage = equipmentService.findAll(page, size);
 
         Equipment equipment = equipmentService.findById(id);
@@ -111,6 +149,13 @@ public class EquipmentController {
 
         model.addAttribute("equipment", equipment);
         model.addAttribute("openEditModal", true);
+
+        List<BorrowingRecord> pendingRecords = borrowingRecordService.getBorrowingRecordsByStatusPending();
+        model.addAttribute("pendingRecords", pendingRecords != null ? pendingRecords : new ArrayList<>());
+
+        model.addAttribute("categories", List.of(
+                "Tất cả", "Vi điều khiển", "Linh kiện", "Thiết bị", "Cảm biến"
+        ));
 
         return "admin/equipments";
     }
@@ -136,4 +181,6 @@ public class EquipmentController {
         }
         return "redirect:/admin/equipments";
     }
+
+
 }

@@ -1,6 +1,9 @@
 package ra.service.impl.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ra.model.entity.MentoringSession;
 import ra.model.enum_status.SessionStatus;
@@ -51,6 +54,21 @@ public class MentoringSessionServiceImpl implements MentoringSessionService {
     @Override
     public MentoringSession getSessionById(Long sessionId) {
         return mentoringSessionRepository.findById(sessionId).orElse(null);
+    }
+
+    @Override
+    public List<MentoringSession> getMentoringSessionsByStudentId(Long studentId) {
+        return mentoringSessionRepository.findByStudentId(studentId);
+    }
+
+    @Override
+    public Page<MentoringSession> getPaginatedSessions(Long studentId, Pageable pageable) {
+        return mentoringSessionRepository.findAllByStudentId(studentId, pageable);
+    }
+
+    @Override
+    public List<Object[]> getTopLecturersByCompleted() {
+        return mentoringSessionRepository.findTopLecturersByCompleted(PageRequest.of(0, 5));
     }
 
 

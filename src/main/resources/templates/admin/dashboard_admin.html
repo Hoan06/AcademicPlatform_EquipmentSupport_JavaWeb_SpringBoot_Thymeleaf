@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - SALSP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b0d14;
+            --bg-sidebar: #11131f;
+            --bg-card: #151823;
+            --primary-gold: #ffb142;
+            --border-custom: #252936;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: white;
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .bg-sidebar { background-color: var(--bg-sidebar); }
+        .bg-card { background-color: var(--bg-card); }
+        .border-custom { border-color: var(--border-custom); }
+        .text-gold { color: var(--primary-gold); }
+        .bg-gold { background-color: var(--primary-gold); }
+
+        .neon-text {
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 177, 66, 0.3);
+        }
+
+        .bar-gradient {
+            background: linear-gradient(to top, var(--primary-gold) 0%, #ffcd82 100%);
+            box-shadow: 0 4px 15px rgba(255, 177, 66, 0.2);
+            width: 40px;
+        }
+
+        @keyframes growUp {
+            from { height: 0; opacity: 0; }
+            to { opacity: 1; }
+        }
+        .bar-animate {
+            animation: growUp 1s ease-out forwards;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+<aside class="w-72 bg-sidebar border-r border-custom flex flex-col shrink-0 relative z-20">
+    <div class="p-8">
+        <div class="flex items-center gap-3 text-gold font-bold tracking-widest text-sm">
+
+        </div>
+    </div>
+
+    <nav class="flex-1 px-6 space-y-1">
+        <p class="text-gray-600 text-[11px] font-bold uppercase mb-4 px-2 tracking-widest">Quản trị</p>
+        <a th:href="@{/admin/dashboardAdmin}" class="flex items-center text-white bg-white/5 border-r-4 border-gold p-3 rounded-xl transition">
+            <i class="fas fa-th-large w-8 text-center mr-2 text-gold"></i> Bảng điều khiển
+        </a>
+        <a th:href="@{/admin/equipments}" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition group">
+            <i class="fas fa-box w-8 text-center mr-2 group-hover:text-gold transition-colors"></i> Thiết bị & Tài liệu
+        </a>
+        <a th:href="@{/admin/users}" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition group">
+            <i class="fas fa-users w-8 text-center mr-2 group-hover:text-gold transition-colors"></i> Người dùng
+        </a>
+        <a th:href="@{/admin/loanSlip}" class="flex items-center text-gray-400 p-3 rounded-xl hover:bg-white/5 transition justify-between group">
+            <span><i class="fas fa-file-invoice w-8 text-center mr-2 group-hover:text-gold transition-colors"></i> Phiếu mượn</span>
+            <span class="bg-gold text-black text-[10px] px-2 py-0.5 rounded-full font-bold" th:text="${pendingRecords.size()}">0</span>
+        </a>
+    </nav>
+
+    <div class="p-6 border-t border-custom mt-auto">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold border border-white/10">A</div>
+            <div class="flex-1 overflow-hidden">
+                <p class="text-sm font-bold truncate">Admin Hệ thống</p>
+                <p class="text-[10px] text-gray-500 uppercase truncate" th:text="${userLogin}">admin_user</p>
+            </div>
+            <a th:href="@{/auth/logout}" class="text-gray-500 hover:text-white transition-all">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<main class="flex-1 overflow-y-auto relative">
+    <div class="p-8 relative z-10">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl font-bold neon-text">Tổng quan hoạt động</h1>
+                <p class="text-gray-500 text-sm mt-1">Hệ thống quản lý phòng Lab • Trạng thái: Sẵn sàng</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-card p-6 rounded-2xl border border-custom group hover:border-gold/30 transition-all">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 bg-gold/10 rounded-xl flex items-center justify-center text-gold"><i class="fas fa-box"></i></div>
+                </div>
+                <div class="text-3xl font-bold stat-number" th:attr="data-target=${totalEquipmentInSystem != null ? totalEquipmentInSystem : 0}">0</div>
+                <div class="text-gray-500 text-xs mt-1 uppercase tracking-wider">Tổng thiết bị</div>
+            </div>
+
+            <div class="bg-card p-6 rounded-2xl border border-custom hover:border-gold/30 transition-all">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-400"><i class="fas fa-clipboard-check"></i></div>
+                </div>
+                <div class="text-3xl font-bold stat-number" th:attr="data-target=${totalEquipmentBorrowing != null ? totalEquipmentBorrowing : 0}">0</div>
+                <div class="text-gray-500 text-xs mt-1 uppercase tracking-wider">Đang được mượn</div>
+            </div>
+
+            <div class="bg-card p-6 rounded-2xl border border-custom hover:border-gold/30 transition-all">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400"><i class="far fa-clock"></i></div>
+                </div>
+                <div class="text-3xl font-bold stat-number" th:attr="data-target=${totalEquipmentPending != null ? totalEquipmentPending : 0}">0</div>
+                <div class="text-gray-500 text-xs mt-1 uppercase tracking-wider">Chờ xuất kho</div>
+            </div>
+
+            <div class="bg-card p-6 rounded-2xl border border-custom hover:border-gold/30 transition-all">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center text-red-400"><i class="fas fa-triangle-exclamation"></i></div>
+                </div>
+                <div class="text-3xl font-bold stat-number" th:attr="data-target=${totalEquipmentStockDanger != null ? totalEquipmentStockDanger : 0}">0</div>
+                <div class="text-gray-500 text-xs mt-1 uppercase tracking-wider">Cảnh báo tồn kho</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-8">
+            <div class="col-span-12 lg:col-span-8 bg-card rounded-[24px] border border-custom p-8">
+                <h3 class="font-bold flex items-center gap-3 mb-10">
+                    <span class="w-1.5 h-5 bg-gold rounded-full"></span> Top 5 Giảng viên có lượt tư vấn nhiều nhất
+                </h3>
+
+                <div class="flex items-end justify-around h-64 px-4 border-b border-white/5"
+                     th:if="${topLecturers != null and !#lists.isEmpty(topLecturers)}">
+                    <div class="flex flex-col items-center gap-3 group h-full justify-end"
+                         th:each="item, iter : ${topLecturers}">
+                        <div class="bar-gradient rounded-t-lg bar-animate transition-all group-hover:brightness-110 relative"
+                             th:style="'height: ' + (${topLecturers[0][1] > 0 ? (15 + item[1] * 75 / topLecturers[0][1]) : 15}) + '%; animation-delay: ' + (${iter.index} * 0.1) + 's;'">
+                            <div class="absolute -top-7 left-1/2 -translate-x-1/2 text-gold font-bold text-xs"
+                                 th:text="${item[1]}">0</div>
+                        </div>
+                        <p class="text-[11px] font-bold text-gray-400 mb-[-35px] max-w-[110px] truncate"
+                           th:text="${item[0].profile != null ? item[0].profile.fullName : item[0].username}">
+                            Tên GV
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center h-64 px-4 border-b border-white/5 text-gray-500 text-sm"
+                     th:if="${topLecturers == null or #lists.isEmpty(topLecturers)}">
+                    Chưa có dữ liệu tư vấn
+                </div>
+
+                <div class="h-10"></div>
+            </div>
+
+            <div class="col-span-12 lg:col-span-4 space-y-8">
+                <div class="bg-card rounded-[24px] border border-custom p-6">
+                    <h3 class="font-bold text-sm uppercase tracking-wider mb-6 flex items-center gap-2"><i class="fas fa-fire text-gold"></i> Thiết bị mượn nhiều</h3>
+
+                    <div class="space-y-6" th:if="${topEquipments != null and !#lists.isEmpty(topEquipments)}">
+                        <div class="space-y-2" th:each="item : ${topEquipments}">
+                            <div class="flex justify-between text-[11px] text-gray-400">
+                                <span class="truncate max-w-[180px]" th:text="${item[0].name}">Tên thiết bị</span>
+                                <span class="text-white" th:text="${item[1] + '/' + item[0].quantity}">0/0</span>
+                            </div>
+                            <div class="h-1.5 bg-sidebar rounded-full overflow-hidden">
+                                <div class="h-full bg-gold"
+                                     th:style="'width: ' + (${item[0].quantity != null and item[0].quantity > 0 ? item[1] * 100 / item[0].quantity : 0}) + '%'"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-gray-500 text-sm" th:if="${topEquipments == null or #lists.isEmpty(topEquipments)}">
+                        Chưa có dữ liệu mượn thiết bị
+                    </div>
+                </div>
+
+                <div class="bg-card rounded-[24px] border border-custom p-6">
+                    <h3 class="font-bold text-sm uppercase tracking-wider mb-4">Thao tác nhanh</h3>
+                    <div class="space-y-3">
+                        <a th:href="@{/admin/equipments}" class="flex items-center justify-between p-4 bg-sidebar hover:bg-gold/5 border border-transparent hover:border-gold/20 rounded-xl transition-all group">
+                            <div class="flex items-center gap-3"><i class="fas fa-plus-circle text-gold"></i><span class="text-[13px]">Thiết bị mới</span></div>
+                            <i class="fas fa-chevron-right text-[10px] text-gray-600"></i>
+                        </a>
+                        <a href="#" class="flex items-center justify-between p-4 bg-sidebar hover:bg-gold/5 border border-transparent hover:border-gold/20 rounded-xl transition-all group">
+                            <div class="flex items-center gap-3"><i class="fas fa-print text-gold"></i><span class="text-[13px]">Xuất báo cáo</span></div>
+                            <i class="fas fa-chevron-right text-[10px] text-gray-600"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const counters = document.querySelectorAll('.stat-number');
+    const speed = 200;
+
+    counters.forEach(counter => {
+        const updateCount = () => {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+            const inc = target / speed;
+
+            if (count < target) {
+                counter.innerText = Math.ceil(count + inc);
+                setTimeout(updateCount, 15);
+            } else {
+                counter.innerText = target;
+            }
+        };
+        updateCount();
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+:root {
+    --bg-main: #0b0d14;
+    --bg-sidebar: #11131f;
+    --bg-card: #151823;
+    --primary-gold: #ffb142;
+    --border-custom: #252936;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: white;
+    font-family: 'Quicksand', sans-serif;
+    margin: 0;
+    overflow: hidden;
+}
+
+.bg-sidebar { background-color: var(--bg-sidebar); }
+.bg-custom-card { background-color: var(--bg-card); }
+.border-custom { border-color: var(--border-custom); }
+.text-gold { color: var(--primary-gold); }
+.bg-gold { background-color: var(--primary-gold); }
+.border-gold { border-color: var(--primary-gold); }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 10px; }
+
+input:focus {
+    border-color: var(--primary-gold) !important;
+    box-shadow: 0 0 0 2px rgba(255, 177, 66, 0.1);
+}

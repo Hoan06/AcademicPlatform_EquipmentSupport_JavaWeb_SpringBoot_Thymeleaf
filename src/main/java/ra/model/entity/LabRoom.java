@@ -6,25 +6,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
-@Table(name = "academic_evaluations")
+@Table(name = "lab_rooms")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class AcademicEvaluation {
+public class LabRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "session_id")
-    private MentoringSession session;
+    private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "lab_room_id")
-    private LabRoom labRoom;
-
-    private String comment;
-    private String performance;
+    @OneToMany(mappedBy = "labRoom")
+    private List<AcademicEvaluation> evaluations;
 }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ra.model.enum_status.BorrowingStatus;
 
 import java.util.List;
 
@@ -23,7 +24,8 @@ public class BorrowingRecord {
     @JoinColumn(name = "session_id")
     private MentoringSession session;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private BorrowingStatus status;
 
     @OneToMany(mappedBy = "borrowingRecord", cascade = CascadeType.ALL)
     private List<BorrowingDetail> details;

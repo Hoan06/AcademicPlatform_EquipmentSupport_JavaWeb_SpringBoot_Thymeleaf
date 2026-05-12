@@ -61,7 +61,9 @@
       <div class="input-group">
         <label>Tài khoản</label>
         <input type="text" th:field="*{username}" placeholder="SV2024001">
-        <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></small>
+        <small th:if="${#fields.hasErrors('username')}"
+               th:text="${#fields.errors('username')[0]}"></small>
+
       </div>
 
       <div class="input-group">
@@ -70,7 +72,9 @@
           <input type="password" th:field="*{password}" placeholder="••••••••">
           <i class="far fa-eye" style="position: absolute; right: 15px; top: 12px; color: #555; cursor: pointer;"></i>
         </div>
-        <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+        <small th:if="${#fields.hasErrors('password')}"
+               th:text="${#fields.errors('password')[0]}"></small>
+
       </div>
 
       <div class="input-group">
@@ -78,7 +82,8 @@
         <div style="position: relative;">
           <input type="password" th:field="*{confirmPassword}" placeholder="••••••••">
         </div>
-        <small th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></small>
+        <small th:if="${#fields.hasErrors('confirmPassword')}"
+               th:text="${#fields.errors('confirmPassword')[0]}"></small>
       </div>
 
       <button type="submit" class="btn-login">

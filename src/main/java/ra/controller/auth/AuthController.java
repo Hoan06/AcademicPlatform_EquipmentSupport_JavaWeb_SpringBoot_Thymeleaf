@@ -40,7 +40,7 @@ public class AuthController {
                 case "user":
                     return "redirect:/client/profile";
                 default:
-                    return "redirect:/lecturer";
+                    return "redirect:/lecturer/profileLecturer";
             }
         }
         return null;

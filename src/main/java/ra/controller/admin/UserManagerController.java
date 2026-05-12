@@ -13,9 +13,11 @@ import ra.model.dto.EquipmentDTO;
 import ra.model.dto.LecturerRegisterDTO;
 import ra.model.dto.RegisterDTO;
 import ra.model.dto.UserDTO;
+import ra.model.entity.BorrowingRecord;
 import ra.model.entity.Lecturer;
 import ra.model.entity.User;
 import ra.model.entity.UserProfile;
+import ra.service.BorrowingRecordService;
 import ra.service.DepartmentService;
 import ra.service.LecturerService;
 import ra.service.UserService;
@@ -35,18 +37,14 @@ public class UserManagerController {
     @Autowired
     private LecturerService lecturerService;
 
+    @Autowired
+    private BorrowingRecordService borrowingRecordService;
+
     @GetMapping("/users")
     public String users(@RequestParam(defaultValue = "1") Integer page, Model model , HttpSession session) {
-        if (session.getAttribute("userLogin") == null) {
-            return "redirect:/auth/login";
-        }
+
         Object user = session.getAttribute("userLogin");
-        Object role = session.getAttribute("role");
-        if(role != null && role.equals("user")){
-            return "redirect:/client/home";
-        } else if(role != null && role.equals("lecturer")){
-            return "redirect:/lecturer/home";
-        }
+
 
         if (!model.containsAttribute("userDto")) {
             model.addAttribute("userDto", new LecturerRegisterDTO());
@@ -59,6 +57,9 @@ public class UserManagerController {
         model.addAttribute("userLogin", user.toString());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", users.getTotalPages());
+
+        List<BorrowingRecord> records = borrowingRecordService.getBorrowingRecordsByStatusPending();
+        model.addAttribute("pendingRecords", records);
 
         return "/admin/user_manager";
     }

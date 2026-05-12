@@ -19,7 +19,7 @@
 
     <nav class="flex-1 px-4 space-y-2">
 
-        <a href="#" class="flex items-center gap-4 p-4 text-gray-400 hover:bg-white/5 rounded-2xl transition-all group">
+        <a th:href="@{/client/dashboardClient}" class="flex items-center gap-4 p-4 text-gray-400 hover:bg-white/5 rounded-2xl transition-all group">
             <i class="fas fa-th-large group-hover:text-white"></i>
             <span>Bảng điều khiển</span>
         </a>
@@ -28,7 +28,7 @@
             <i class="fas fa-calendar-alt w-5 text-gold"></i> Đặt lịch tư vấn
         </a>
 
-        <a href="#" class="flex items-center gap-4 p-4 text-gray-400 hover:bg-white/5 rounded-2xl transition-all group">
+        <a th:href="@{/client/history}" class="flex items-center gap-4 p-4 text-gray-400 hover:bg-white/5 rounded-2xl transition-all group">
             <i class="fas fa-book group-hover:text-white"></i>
             <span>Lịch sử học tập</span>
         </a>

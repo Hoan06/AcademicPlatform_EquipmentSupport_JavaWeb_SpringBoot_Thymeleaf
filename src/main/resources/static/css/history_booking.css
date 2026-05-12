@@ -1,0 +1,27 @@
+:root {
+    --gold: #FFD700;
+    --bg-dark: #0F1117;
+    --card-dark: #161922;
+    --sidebar-dark: #0B0E14;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: white;
+    font-family: 'Quicksand', sans-serif;
+}
+
+.bg-custom-sidebar { background-color: var(--sidebar-dark); }
+.bg-custom-card { background-color: var(--card-dark); }
+.text-gold { color: var(--gold); }
+.border-gold { border-color: var(--gold); }
+.bg-gold { background-color: var(--gold); }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 10px; }
+
+summary::-webkit-details-marker { display: none; }
+summary { list-style: none; }
+details[open] .fa-chevron-down { transform: rotate(180deg); }
+details { transition: all 0.3s ease; }
