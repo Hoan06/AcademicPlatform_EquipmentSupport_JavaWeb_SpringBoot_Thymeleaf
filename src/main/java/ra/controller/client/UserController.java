@@ -171,7 +171,7 @@ public class UserController {
             if (bookingDTO.getDepartmentId() != null) {
                 model.addAttribute("lecturers", lecturerService.findByDepartmentId(bookingDTO.getDepartmentId()));
             }
-            return "client/booking";
+            return "client/history_booking";
         }
 
         int startHour = bookingDTO.getTimeSlotId().intValue();
@@ -208,7 +208,8 @@ public class UserController {
             mentoringSessionService.save(mentoringSession);
 
             redirectAttributes.addFlashAttribute("success", "Đặt lịch tư vấn thành công!");
-            return "redirect:/client/booking";
+
+            return "redirect:/client/history";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,7 +219,7 @@ public class UserController {
             if (bookingDTO.getDepartmentId() != null) {
                 model.addAttribute("lecturers", lecturerService.findByDepartmentId(bookingDTO.getDepartmentId()));
             }
-            return "client/booking";
+            return "redirect:/client/history";
         }
     }
 
